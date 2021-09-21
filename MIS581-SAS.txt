@@ -1,0 +1,27 @@
+/* *************************** RQ2 ****************************** */
+/* Ingest working data. */
+proc import datafile='/home/richardkapalko1/sasuser.v94/RQ2.csv' 
+            dbms=CSV out=WORK.RQ2 replace; getnames=YES;
+            run;
+proc means data=RQ2; VAR Count ActivityRatio;
+     run;
+/* Notice an outlier with Count=262; Remove it. */
+proc sql;
+   delete from RQ2 where Count = 262;
+   run;
+proc means data=RQ2; VAR Count ActivityRatio;
+   run;
+/* Run pearsons correlation test */      
+proc corr data=RQ2; run;
+/* moderate negative relationship of 0.43, with a 7.5% chance of error */ 
+/* lets plot it for the SMEs to see */
+proc sgplot data=RQ2 noautolegend;
+   scatter X=Count Y=ActivityRatio / dataskin=CRISP;
+   title "Correlation between Count and Activity Ratio";
+   reg X=Count Y=ActivityRatio;
+run;
+/* there are other possible outliers 
+   but visual inspection indicates nothing much will change */
+
+
+

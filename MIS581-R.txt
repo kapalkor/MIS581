@@ -1,0 +1,28 @@
+# Some global values.
+rm(list=ls())  
+graphics.off()  
+options(scipen=999)  
+
+# Import dataset.
+setwd("C:/Users/rickk/Desktop/RQ3_R")
+tryCatch( { # guard against missing data
+  RQ3.df <- read.csv("RQ3.csv", header = TRUE)  
+  View(RQ3.df)
+}, warning=function(w){print(w)}, error=function(e){print(e)} )
+
+# Show var names, types, and counts.
+stat <- data.frame(
+           Class  = sapply( RQ3.df, class ),
+           Length = sapply( RQ3.df, length ),
+           UniqCnt= sapply( RQ3.df, function(x)length(unique(x)) ),
+           Missing= sapply( RQ3.df, 
+                            function(x)sum(length(which(is.na(x))))) )  
+stat[order(stat$Class),]  
+rm(stat) # tidy
+
+# Review correlation matrix.
+round(cor(RQ3.df),3)
+
+# Run linear model.
+myFit <- lm(LeadTime ~ TeamName + StoryPts + Priority + Deployed, RQ3.df)
+summary(myFit)
